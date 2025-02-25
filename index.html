@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小公主，我们和好吧</title>
+    <style>
+        /* 全局样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 心形容器样式 */
+        .heart-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        /* 心形样式 */
+        .heart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            background-color: #ff3366;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            box-shadow: 0 0 20px rgba(255, 51, 102, 0.8);
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: #ff3366;
+            border-radius: 50%;
+        }
+
+        .heart::before {
+            top: -50px;
+            left: 0;
+        }
+
+        .heart::after {
+            left: 50px;
+            top: 0;
+        }
+
+        /* 心跳动画 */
+        @keyframes heartbeat {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* 文本容器样式 */
+        .text-container {
+            position: absolute;
+            text-align: center;
+            z-index: 1;
+            color: white;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        /* 标题样式 */
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        /* 段落样式 */
+        p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        /* 按钮样式 */
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: white;
+            color: #ff3366;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            animation: fadeIn 1s ease-out 0.5s both;
+            margin: 0 10px;
+        }
+
+        button:hover {
+            background-color: #ff3366;
+            color: white;
+        }
+
+        /* 烟花样式 */
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: white;
+            animation: firework 1s ease-out forwards;
+        }
+
+        /* 烟花动画 */
+        @keyframes firework {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(10);
+                opacity: 0;
+            }
+        }
+
+        /* 文本淡入上移动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 淡入动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 花瓣样式 */
+        .petal {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ff9a9e;
+            border-radius: 50%;
+            animation: fall 5s linear infinite;
+        }
+
+        /* 花瓣飘落动画 */
+        @keyframes fall {
+            from {
+                top: -10px;
+                transform: translateX(0);
+            }
+
+            to {
+                top: 100vh;
+                transform: translateX(200px);
+            }
+        }
+
+        /* 摇头动画 */
+        @keyframes shakeHead {
+            0% {
+                transform: rotate(0deg);
+            }
+            25% {
+                transform: rotate(-10deg);
+            }
+            50% {
+                transform: rotate(10deg);
+            }
+            75% {
+                transform: rotate(-10deg);
+            }
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        /* 摇头动画应用到心形容器 */
+        .shake {
+            animation: shakeHead 0.5s ease-in-out;
+            animation-iteration-count: 3;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 心形容器 -->
+    <div class="heart-container" id="heartContainer">
+        <div class="heart"></div>
+    </div>
+    <!-- 文本容器 -->
+    <div class="text-container">
+    	<h1>张心缘，我们和好吧</h1>
+        <p>是我不好，我知道错啦，再给我一次好好表现的机会。再一再二不能再三啊，不然我就...我就真的没办法了。</p>
+        <button onclick="handleAgree()">原谅你啦</button>
+        <button onclick="handleReject()">再考虑下</button>
+    </div>
+    <!-- 烟花容器 -->
+    <div id="fireworks"></div>
+    <!-- 花瓣容器 -->
+    <div id="petals"></div>
+
+    <script>
+        let rejectCount = 0;
+        const MAX_REJECT_COUNT = 3;
+
+        // 页面加载时创建花瓣
+        window.onload = function () {
+            createPetals();
+        };
+
+        // 创建花瓣的函数
+        function createPetals() {
+            const petalsContainer = document.getElementById('petals');
+            for (let i = 0; i < 50; i++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+                petal.style.left = Math.random() * window.innerWidth + 'px';
+                petal.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                petal.style.animationDelay = Math.random() * 5 + 's';
+                petalsContainer.appendChild(petal);
+            }
+        }
+
+        // 处理同意的函数
+        function handleAgree() {
+            const fireworksContainer = document.getElementById('fireworks');
+            // 创建多个烟花元素
+            for (let i = 0; i < 20; i++) {
+                const firework = document.createElement('div');
+                firework.classList.add('firework');
+                // 随机设置烟花的位置
+                firework.style.left = Math.random() * window.innerWidth + 'px';
+                firework.style.top = Math.random() * window.innerHeight + 'px';
+                fireworksContainer.appendChild(firework);
+            }
+            // 更改标题和按钮文字
+            const h1 = document.querySelector('h1');
+            const buttons = document.querySelectorAll('button');
+            h1.textContent = '太开心啦，和好啦，和好啦！';
+            buttons.forEach(button => {
+                button.textContent = '嘻嘻，(*^ｰ^)人(^ｰ^*)ノ';
+                button.disabled = true;
+            });
+            const p = document.querySelector('p');
+            //const buttons = document.querySelectorAll('button');
+            p.textContent = '合作愉快啊！！！';
+            
+        }
+
+        // 处理拒绝的函数
+        function handleReject() {
+            rejectCount++;
+            if (rejectCount >= MAX_REJECT_COUNT) {
+                const heartContainer = document.getElementById('heartContainer');
+                heartContainer.classList.add('shake');
+                setTimeout(() => {
+                    heartContainer.classList.remove('shake');
+                }, 1500);
+            }
+        }
+    </script>
+</body>
+
+</html>
